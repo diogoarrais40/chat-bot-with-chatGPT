@@ -11,16 +11,42 @@ def speak():
     pass
 
 def clear():
-    pass
+    my_text.delete(1.0, END)
+    chat_entry.delete(0, END)
 
 def key():
     root.geometry('600x650')
     api_frame.pack(pady=30)
+    #define file name
+    filename = "api_key"
+    try:
+        if os.path.isfile(filename):
+            input_file = open(filename, 'rb')
+            #load the data
+            file_content = pickle.load(input_file)
+            api_entry.insert(END, file_content)
+        else:
+            input_file = open(filename, 'wb')
+            input_file.close()
+    except Exception as e:
+        my_text.insert(END, "ERROR ")
+
+
 
 def save_key():
-    api_frame.pack_forget()
-    root.geometry("600x500")
+    try:
+        #define our file name
+        filename = "api_key"
+        output_file = open(filename, 'wb')
 
+        pickle.dump(api_entry.get(), output_file)
+
+        api_entry.delete(0, END)
+
+        api_frame.pack_forget()
+        root.geometry("600x500")
+    except Exception as e:
+        my_text.insert(END, "ERROR ")
 
 root = customtkinter.CTk()  # create CTk window like you do with the Tk window
 root.geometry("600x500")
