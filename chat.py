@@ -8,7 +8,43 @@ customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dar
 customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
 
 def speak():
-    pass
+    if chat_entry.get():
+         #define file name
+         filename = "api_key"
+         try:
+             if os.path.isfile(filename):
+                 input_file = open(filename, 'rb')
+                 #load the data
+                 file_content = pickle.load(input_file)
+
+                 #Query ChatGPT
+                 #define our api key to chatGPT
+                 openai.api_key = file_content
+
+                 #create an instance
+                 openai.Model.list()
+
+                 response = openai.Completion.create(
+                        model = "text-davinci-003",
+                        prompt = chat_entry.get(),
+                        temperature = 0,
+                        max_tokens = 60,
+                        top_p = 1.0,
+                        frequency_penalty=0.0,
+                        presence_penalty=0.0
+                 )
+
+                 my_text.insert(END, response["choices"][0]["text"])
+                 my_text.insert(END, '\n\n')
+
+             else:
+                 input_file = open(filename, 'wb')
+                 input_file.close()
+                 my_text.insert(END, "Please insert your API Key to talk with ChatGPT!")
+         except Exception as e:
+             my_text.insert(END, f"ERROR {e}")
+    else:
+        my_text.insert(END, "Type something, you forgot to write your question")
 
 def clear():
     my_text.delete(1.0, END)
@@ -30,8 +66,6 @@ def key():
             input_file.close()
     except Exception as e:
         my_text.insert(END, "ERROR ")
-
-
 
 def save_key():
     try:
